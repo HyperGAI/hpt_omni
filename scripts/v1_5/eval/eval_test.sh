@@ -1,0 +1,1 @@
+./scripts/v1_5/eval/mmbench_sharded.sh ./checkpoints/hpt15_air_stage3/checkpoint-6000/ hpt_new llama_3
