@@ -2,12 +2,13 @@
 
 n_node=1
 MASTER_ADDR=172.29.201.22
+MASTER_ADDR=172.29.19.160
 CURRENT_RANK=0
 BASE_MODEL_PATH='/export/share/models/Meta-Llama-3-8B-Instruct/'
 OUTPUT='hpt15_air_stage1'
 bs=32
 
-torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
+torchrun --nnodes=$n_node --nproc_per_node=1 --master_port=25001 \
     --master_addr $MASTER_ADDR --node_rank=$CURRENT_RANK \
     llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
