@@ -86,6 +86,7 @@ def prepare_config_for_training(
     if getattr(config, "vision_tower_cfg", None) is not None:
         config.mm_vision_select_layer = model_args.mm_vision_select_layer
         config.mm_vision_select_feature = model_args.mm_vision_select_feature
+        config.image_size = model_args.image_size
         ## vision tower configurations
         config.vision_resolution = model_args.vision_resolution
         config.interpolate_mode = model_args.interpolate_mode

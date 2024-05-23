@@ -53,6 +53,7 @@ class ModelArguments:
     s2: bool = field(default=False)
     s2_scales: Optional[str] = field(default="336,672,1008")
     s2_max_split_size: int = field(default=336)
+    image_size: int = field(default=384)
 
 
 

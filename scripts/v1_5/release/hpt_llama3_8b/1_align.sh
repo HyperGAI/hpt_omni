@@ -6,7 +6,7 @@ MASTER_ADDR=172.29.19.160
 CURRENT_RANK=0
 BASE_MODEL_PATH='/export/share/models/Meta-Llama-3-8B-Instruct/'
 OUTPUT='hpt15_air_stage1'
-bs=32
+bs=8
 
 torchrun --nnodes=$n_node --nproc_per_node=1 --master_port=25001 \
     --master_addr $MASTER_ADDR --node_rank=$CURRENT_RANK \
@@ -44,4 +44,5 @@ torchrun --nnodes=$n_node --nproc_per_node=1 --master_port=25001 \
     --model_max_length 4096 \
     --gradient_checkpointing True \
     --dataloader_num_workers 8 \
+    --image_size 490 \
     --lazy_preprocess True 
