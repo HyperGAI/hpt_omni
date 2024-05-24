@@ -51,14 +51,14 @@ def register_datasets_mixtures():
     )
     add_dataset(blip_laion_cc_sbu_558k)
     
-    hpt15_v4 = Dataset(
-        dataset_name='hpt15_v4_1',
+    hpt_v41_text01 = Dataset(
+        dataset_name='hpt_v41_text01',
         dataset_type='torch',
-        data_path='/export/share/yucheng/playground/hpt2.0/vila/hpt_v4_1_checked.json',
-        # data_path='/export/share/yucheng/playground/hpt2.0/llava_v1_5_mix665k_test.json',
+        # data_path='/export/share/yucheng/playground/hpt2.0/text_only/hpt_v41_text01.json',
+        data_path='/export/share/yucheng/playground/hpt2.0/llava_v1_5_mix665k_test.json',
         image_path='/export/share/dataset/llava1.6'
     )
-    add_dataset(hpt15_v4)
+    add_dataset(hpt_v41_text01)
 
     # Pretrain
     coyo_25m = Dataset(
