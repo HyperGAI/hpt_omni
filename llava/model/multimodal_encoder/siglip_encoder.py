@@ -2,11 +2,12 @@ import torch
 from llava.model.multimodal_encoder.vision_encoder import VisionTower, VisionTowerS2
 
 from transformers import AutoConfig, PretrainedConfig, AutoModel
-from .siglip import (
-    SiglipVisionConfig,
-    SiglipVisionModel,
-    SiglipImageProcessor,
-)
+from transformers import SiglipVisionConfig, SiglipVisionModel, SiglipImageProcessor
+# from .siglip import (
+#     SiglipVisionConfig,
+#     SiglipVisionModel,
+#     SiglipImageProcessor,
+# )
 
 def interpolate_pos_embed_siglip(model, new_size):
     # 577 1024
@@ -66,6 +67,5 @@ class SiglipVisionTowerS2(VisionTowerS2):
         self.is_loaded = True
 
 
-AutoConfig.register("siglip_vision_model", SiglipVisionConfig)
-AutoModel.register(SiglipVisionConfig, SiglipVisionModel)
-
+# AutoConfig.register("siglip_vision_model", SiglipVisionConfig)
+# AutoModel.register(SiglipVisionConfig, SiglipVisionModel)

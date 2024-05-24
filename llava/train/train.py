@@ -241,6 +241,10 @@ def train():
             config = LlavaGemmaConfig.from_pretrained(model_args.model_name_or_path)
             config._attn_implementation = "flash_attention_2"
             model_cls = LlavaGemmaForCausalLM
+        elif 'phi-3' in model_args.model_name_or_path.lower():
+            config = LlavaPhi3Config.from_pretrained(model_args.model_name_or_path)
+            # config._attn_implementation = 'flash_attention_2'
+            model_cls = LlavaPhi3Model
         else:
             ## llm and default multimodal model
             model_cls = LlavaLlamaModel

@@ -14,6 +14,10 @@ site_pkg_path=$(python -c 'import site; print(site.getsitepackages()[0])')
 cp -rv ./llava/train/transformers_replace/* $site_pkg_path/transformers/
 ```
 
+transformers version for different llm:
+phi_3: 4.41.1
+
+
 # Exps
 HPT
 ```
