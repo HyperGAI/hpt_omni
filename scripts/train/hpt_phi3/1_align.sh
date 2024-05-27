@@ -1,10 +1,10 @@
 #!/bin/bash
 
 n_node=1
-MASTER_ADDR=172.29.201.25
+MASTER_ADDR=172.29.251.23
 CURRENT_RANK=0
 BASE_MODEL_PATH='/export/share/models/Phi-3-mini-4k-instruct'
-OUTPUT='hpt15_phi3_stage1'
+OUTPUT='hpt15_phi3/stage1'
 bs=32
 
 torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
@@ -33,7 +33,7 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 1000 \
-    --save_total_limit 5 \
+    --save_total_limit 1 \
     --learning_rate 1e-4 \
     --weight_decay 0. \
     --warmup_ratio 0.03 \
@@ -44,4 +44,5 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --gradient_checkpointing True \
     --dataloader_num_workers 8 \
     --image_size 490 \
-    --lazy_preprocess True 
+    --lazy_preprocess True \
+    --report_to none

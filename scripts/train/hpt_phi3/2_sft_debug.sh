@@ -1,19 +1,18 @@
 #!/bin/bash
 
 n_node=1
-MASTER_ADDR=172.29.251.23
+MASTER_ADDR=172.29.19.160
+# MASTER_ADDR=172.29.201.25
 CURRENT_RANK=0
 BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt15_phi3/stage1'
 OUTPUT='hpt15_phi3/stage2'
-bs=16
+bs=2
 
-torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
-    --master_addr $MASTER_ADDR --node_rank=$CURRENT_RANK \
-    llava/train/train_mem.py \
-    --deepspeed ./scripts/zero3.json \
+
+python llava/train/train_mem.py \
     --model_name_or_path $BASE_MODEL_PATH \
-    --version phi_3 \
-    --data_mixture hpt_v41 \
+    --version llama_3 \
+    --data_mixture hpt_v41_text01 \
     --vision_tower /export/share/models/siglip-so400m-patch14-384 \
     --mm_vision_select_feature cls_patch \
     --mm_projector mlp \
@@ -42,7 +41,7 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --tf32 True \
     --model_max_length 4096 \
     --gradient_checkpointing True \
-    --dataloader_num_workers 16 \
+    --dataloader_num_workers 0 \
     --lazy_preprocess True \
     --image_size 490 \
     --vflan_no_system_prompt True \

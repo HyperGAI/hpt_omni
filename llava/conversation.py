@@ -30,6 +30,8 @@ class SeparatorStyle(Enum):
     LLAMA_2 = auto()
     MISTRAL = auto()
     LLAMA_3 = auto()
+    Phi_3 = auto()
+    
 
 
 @dataclasses.dataclass
@@ -96,6 +98,16 @@ class Conversation:
                     ret += role + message + self.sep
                 else:
                     ret += role
+        elif self.sep_style == SeparatorStyle.Phi_3:
+            ret = ''
+            for role, message in messages:
+                if message:
+                    if type(message) is tuple:
+                        message, _, _ = message
+                    ret += role + message + self.sep
+                else:
+                    ret += role
+            ret = ret.strip()
         elif self.sep_style == SeparatorStyle.LLAMA_2 or self.sep_style == SeparatorStyle.MISTRAL:
             if self.sep_style == SeparatorStyle.LLAMA_2:
                 wrap_sys = lambda msg: f"<<SYS>>\n{msg}\n<</SYS>>\n\n"
@@ -432,6 +444,7 @@ hermes_2 = Conversation(
 
 
 # Template added by Yukang. Note (kentang-mit@): sep is <|eot_id|> for official template.
+# https://llama.meta.com/docs/model-cards-and-prompt-formats/meta-llama-3/
 llama_3_chat = Conversation(
     system="<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful language and vision assistant. "
            "You are able to understand the visual content that the user provides, "
@@ -446,7 +459,31 @@ llama_3_chat = Conversation(
 )
 
 
-default_conversation = conv_vicuna_v1
+# https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
+phi_3_chat = Conversation(
+    # system="<|system|>\nYou are a helpful language and vision assistant.",
+    system="",
+    roles=("\n<|user|>\n",
+           "\n<|assistant|>\n"),
+    version="phi_3",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.Phi_3,
+    sep="<|end|>",
+)
+
+
+# phi_3_chat in xtuner:
+# phi3_chat=dict(
+#         SYSTEM='<|system|>\n{system}<|end|>\n',
+#         INSTRUCTION='<|user|>\n{input}<|end|>\n<|assistant|>\n',
+#         SUFFIX='<|end|>',
+#         SUFFIX_AS_EOS=True,
+#         SEP='\n',
+#         STOP_WORDS=['<|end|>']),
+
+
+default_conversation = phi_3_chat
 conv_templates = {
     "default": conv_vicuna_v0,
     "hermes-2": hermes_2,
@@ -467,6 +504,7 @@ conv_templates = {
     "llava_llama_2": conv_llava_llama_2,
 
     "mpt": conv_mpt,
+    "phi_3": phi_3_chat
 }
 
 

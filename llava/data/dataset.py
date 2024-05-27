@@ -326,6 +326,122 @@ def preprocess_llama_3(
         input_ids=input_ids,
         labels=targets,
     )
+    
+
+def preprocess_phi_3(
+    sources,
+    tokenizer: transformers.PreTrainedTokenizer,
+    has_image: bool = False,
+    no_system_prompt: bool = False,
+) -> Dict:
+    # Note: implemented by yukang2017@, verified by kentang-mit@
+    conv = conversation_lib.default_conversation.copy()
+    roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
+    if no_system_prompt:
+        conv.system = ""
+
+    # Apply prompt templates
+    conversations = []
+    for i, source in enumerate(sources):
+        if roles[source[0]["from"]] != conv.roles[0]:
+            # Skip the first one if it is not from human
+            source = source[1:]
+
+        conv.messages = []
+        for j, sentence in enumerate(source):
+            role = roles[sentence["from"]]
+            assert role == conv.roles[j % 2], f"{i}"
+            conv.append_message(role, sentence["value"])
+        conversations.append(conv.get_prompt())
+    # Tokenize conversations
+    
+    if has_image:
+        input_ids = torch.stack(
+            [tokenizer_image_token(prompt, tokenizer, return_tensors='pt') for prompt in conversations], dim=0)
+    else:
+        input_ids = tokenizer(
+            conversations,
+            return_tensors="pt",
+            padding="longest",
+            max_length=tokenizer.model_max_length,
+            truncation=True,
+        ).input_ids
+
+    targets = input_ids.clone()
+    assert conv.sep_style == conversation_lib.SeparatorStyle.Phi_3
+
+    # Mask targets
+    sep = conv.sep + conv.roles[1]
+    for conversation, target in zip(conversations, targets):
+        total_len = int(target.ne(tokenizer.pad_token_id).sum())
+
+        rounds = conversation.split(conv.sep)
+        re_rounds = [conv.sep.join(rounds[:2])]  # system + user + gpt
+        for conv_idx in range(2, len(rounds), 2):
+            re_rounds.append(conv.sep.join(rounds[conv_idx:conv_idx + 2]))  # user + gpt
+        cur_len = 0
+        target[:cur_len] = IGNORE_INDEX
+        for i, rou in enumerate(re_rounds):
+            if rou == "":
+                break
+            
+            parts = rou.split(sep)
+            if len(parts) != 2:
+                print(f"WARNING: parts!=: {parts}")
+                break
+            parts[0] += sep
+
+            if has_image:
+                round_len = len(tokenizer_image_token(rou, tokenizer))
+                instruction_len = len(tokenizer_image_token(parts[0], tokenizer)) - 1
+            else:
+                round_len = len(tokenizer(rou).input_ids)
+                instruction_len = len(tokenizer(parts[0]).input_ids) - 1
+            
+            if i == 0:
+                instruction_len += 1
+            else:
+                round_len -= 2
+                instruction_len -= 1
+            
+            '''
+            tokenizer.decode(input_ids[0,:18]): index=18 is the <image> token
+            '<s>  <|user|> What kind of animal is interacting with the laptop in the image? '
+            tokenizer.decode(input_ids[0,19:]):
+            '<|end|> <|assistant|> A cat is interacting with the laptop in the image. <|end|> <|user|> What is the cat doing with the laptop? <|end|> <|assistant|> The cat is playing with the laptop and stepping on its keyboard. <|end|> <|user|> What type of laptop is shown in the image? <|end|> <|assistant|> The image shows a small, white laptop computer. <|end|> <|user|> What is the surface on which the laptop is placed? <|end|> <|assistant|> The laptop is sitting on the ground. <|end|> <|user|> What pattern or color does the cat have? <|end|> <|assistant|> The cat has a tabby pattern. <|end|>'
+            
+            <|user|>: 32010
+            <|assistant|>: 32001
+            <|end|>: 32007
+            
+            input_ids == <|user|>:  2,  35,  62,  86, 109
+            input_ids == <|assistant|>: 21,  46,  74,  99, 120
+            input_ids == <|end|>: 20,  34,  45,  61,  73,  85,  98, 108, 119, 129
+            
+            IGNORE_INDEX range: 
+            [0, 22)
+            [34, 47)
+            [61, 75)
+            [85, 100)
+            [108, 121)
+            [129, 130)
+            '''
+            # print ('cur_len={}, instruction_len={}, cur_len + instruction_len={}, round_len={}'.format(cur_len, instruction_len, cur_len+instruction_len, round_len))
+            target[cur_len: cur_len + instruction_len] = IGNORE_INDEX
+            cur_len += round_len
+
+        target[cur_len:] = IGNORE_INDEX
+        # print (tokenizer.decode(targets[0, targets[0,:]!=-100]))
+
+        # if cur_len < tokenizer.model_max_length:
+        #     if cur_len != total_len:
+        #         target[:] = IGNORE_INDEX
+        #         print(f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}. {sources}" f" (ignored)")
+
+    return dict(
+        input_ids=input_ids,
+        labels=targets,
+    )
 
 
 def preprocess_v1(
@@ -538,6 +654,23 @@ def preprocess(
     3. Tokenize the concatenated conversation;
     4. Make a deepcopy as the target. Mask human words with IGNORE_INDEX.
     """
+    # print ('###')
+    # print (conversation_lib.default_conversation)
+    # print (sources)
+    # print ('###')
+    '''
+    stage1(all use the plain preprocess function):
+    conversation_lib.default_conversation=Conversation(system='', roles=('', ''), messages=(), offset=0, sep_style=<SeparatorStyle.PLAIN: 4>, sep='\n', sep2=None, version='Unknown', skip_next=False)
+    sources=[[{'from': 'human', 'value': "Present a compact description of the photo's key features. <image>"}, {'from': 'gpt', 'value': 'singer freddie lee performing on stage during the freddie lee tour at manchester airport circa 1989'}]]
+    for preprocess_plain, the returned value:
+    {'input_ids': [tensor([    1,  -200, 15640,   285,  1127, 16217,   454, 29872, 15859,   373,
+         7408,  2645,   278,   285,  1127, 16217,   454, 29872,  6282,   472,
+          767, 10530,  4799,   637, 15923, 29871, 29896, 29929, 29947, 29929,
+           13])], 'labels': [tensor([ -100,  -100, 15640,   285,  1127, 16217,   454, 29872, 15859,   373,
+         7408,  2645,   278,   285,  1127, 16217,   454, 29872,  6282,   472,
+          767, 10530,  4799,   637, 15923, 29871, 29896, 29929, 29947, 29929,
+           13])]}
+    '''
     if conversation_lib.default_conversation.version == "mpt" or conversation_lib.default_conversation.version == "hermes-2":
         return preprocess_mpt(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
     if conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.PLAIN:
@@ -550,6 +683,8 @@ def preprocess(
         return preprocess_llama_3(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
     if conversation_lib.default_conversation.version.startswith("v1"):
         return preprocess_v1(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
+    if conversation_lib.default_conversation.version == 'phi_3':
+        return preprocess_phi_3(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
 
     # add end signal and concatenate together
     conversations = []
@@ -733,7 +868,6 @@ class LazySupervisedDataset(Dataset):
 
     
 
-    
     @staticmethod
     def _load_video(video_path, num_video_frames, data_args, fps=None, frame_count=None):
         from llava.mm_utils import opencv_extract_frames
@@ -755,7 +889,6 @@ class LazySupervisedDataset(Dataset):
 
         return pil_imgs, video_loading_succeed
             
-
 
     def __getitem__(self, i) -> Dict[str, torch.Tensor]:
         sources = self.list_data_dict[i]
