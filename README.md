@@ -31,12 +31,17 @@ bash scripts/v1_5/release/hpt/3_sft.sh
 VILA
 ```
 stage-1-alignment
-bash scripts/v1_5/release/3b/1_mm_align.sh
+bash scripts/train/vila_3b/1_mm_align.sh
 
 stage-2-pretrain(2 node)
-bash scripts/v1_5/release/3b/2_pretrain_0.sh
-bash scripts/v1_5/release/3b/2_pretrain_1.sh
+bash scripts/train/vila_3b/2_pretrain_0.sh
+bash scripts/train/vila_3b/2_pretrain_1.sh
 
 stage-3-sft
-bash scripts/v1_5/release/3b/3_sft.sh
+bash scripts/train/vila_3b/3_sft.sh
 ```
+
+
+# Dataset
+Supported Dataset
+- stage1: blip_laion_cc_sbu_558k

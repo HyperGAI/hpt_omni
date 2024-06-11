@@ -32,6 +32,7 @@ def interpolate_pos_embed_siglip(model, new_size):
 class SiglipVisionTower(VisionTower):
     def __init__(self, model_name_or_path: str, config: PretrainedConfig, state_dict=None):
         super().__init__(model_name_or_path, config)
+        # config.image_size = 490
         self.image_processor = SiglipImageProcessor.from_pretrained(model_name_or_path, size={'height': config.image_size, 'width': config.image_size})
         self.vision_tower = SiglipVisionModel.from_pretrained(
             # TODO(ligeng): why pass config here leading to errors?

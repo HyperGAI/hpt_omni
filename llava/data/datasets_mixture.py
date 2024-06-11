@@ -215,8 +215,8 @@ def register_datasets_mixtures():
     vatex = Dataset(
         dataset_name="vatex",
         dataset_type="torch",
-        data_path="./playground/data/vatex/vatex_filtered_v3.json",
-        image_path="./playground/data/vatex/videos_clipped",
+        data_path="/export/share/dataset/vatex/vatex/vatex_filtered_v3_checked.json",
+        image_path="/export/share/dataset/vatex/train",
     )
     add_dataset(vatex)
 

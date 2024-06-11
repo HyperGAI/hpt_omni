@@ -6,10 +6,10 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1
 export NCCL_ASYNC_ERROR_HANDLING=1
 #export CUDA_LAUNCH_BLOCKING=1
 
-n_node=2
-MASTER_ADDR=172.29.251.21
+n_node=3
+MASTER_ADDR=172.29.201.40
 CURRENT_RANK=0
-BASE_MODEL_PATH='/export/share/yucheng/hpt/VILA/checkpoints/3b/stage1'
+BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/vila_3b/stage1'
 OUTPUT='stage2'
 bs=16
 
@@ -31,14 +31,14 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25002 \
     --mm_use_im_patch_token False \
     --image_aspect_ratio resize \
     --bf16 True \
-    --output_dir ./checkpoints/3b/$OUTPUT \
+    --output_dir ./checkpoints/vila_3b/$OUTPUT \
     --num_train_epochs 1 \
     --per_device_train_batch_size $bs \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 1 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
-    --save_steps 35500 \
+    --save_steps 1000 \
     --save_total_limit 2 \
     --learning_rate 5e-5 \
     --weight_decay 0. \

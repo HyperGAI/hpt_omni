@@ -141,7 +141,7 @@ class LlavaLlamaModel(LlavaMetaModel, LlavaMetaForCausalLM, PreTrainedModel):
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
-            seqlens_in_batch=sorted_seqlens_in_batch,
+            # seqlens_in_batch=sorted_seqlens_in_batch,
         )
         return outputs
     

@@ -1,4 +1,5 @@
 __pycache__/
+eval_output/
 *_dev.sh
 config.json
 eval-result/
