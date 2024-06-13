@@ -18,7 +18,7 @@ else:
 ```
 
 
-# Exps
+## Exps
 HPT
 ```
 stage-1-alignment
@@ -41,7 +41,6 @@ stage-3-sft
 bash scripts/train/vila_3b/3_sft.sh
 ```
 
-
-# Dataset
-Supported Dataset
-- stage1: blip_laion_cc_sbu_558k
+## Eval
+- MMbench server: https://mmbench.opencompass.org.cn/mmbench-submission
+- VizWiz server: https://eval.ai/web/challenges/challenge-page/2185/my-submission

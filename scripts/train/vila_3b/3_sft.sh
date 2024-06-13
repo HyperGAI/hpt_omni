@@ -1,9 +1,9 @@
 #!/bin/bash
 
 n_node=1
-MASTER_ADDR=172.29.201.23
+MASTER_ADDR=172.29.201.40
 CURRENT_RANK=0
-BASE_MODEL_PATH='/export/share/yucheng/hpt/VILA/checkpoints/3b/stage2'
+BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/vila_3b/stage2'
 OUTPUT='stage3'
 bs=16
 
@@ -14,7 +14,7 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path $BASE_MODEL_PATH \
     --version v1 \
-    --data_mixture hpt15_v4_1 \
+    --data_mixture hpt_v41+vatex \
     --vision_tower /export/share/models/siglip-so400m-patch14-384 \
     --mm_vision_select_feature cls_patch \
     --mm_projector mlp_downsample \
@@ -26,7 +26,7 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --mm_use_im_patch_token False \
     --image_aspect_ratio resize \
     --bf16 True \
-    --output_dir ./checkpoints/$OUTPUT \
+    --output_dir ./checkpoints/vila_3b/$OUTPUT \
     --num_train_epochs 1 \
     --per_device_train_batch_size $bs \
     --per_device_eval_batch_size 4 \
@@ -46,4 +46,4 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --dataloader_num_workers 16 \
     --lazy_preprocess True \
     --vflan_no_system_prompt True \
-    --report_to wandb
+    --report_to none
