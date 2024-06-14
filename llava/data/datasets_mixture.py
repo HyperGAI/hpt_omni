@@ -33,8 +33,7 @@ def add_dataset(dataset):
 
 
 def register_datasets_mixtures():
-
-    # Align
+    # S1
     llava_1_5_mm_align = Dataset(
         dataset_name='llava_1_5_align',
         dataset_type='torch',
@@ -51,16 +50,7 @@ def register_datasets_mixtures():
     )
     add_dataset(blip_laion_cc_sbu_558k)
     
-    hpt_v41 = Dataset(
-        dataset_name='hpt_v41',
-        dataset_type='torch',
-        data_path='/export/share/yucheng/playground/hpt2.0/vila/hpt_v4_1_checked.json',
-        # data_path='/export/share/yucheng/playground/hpt2.0/llava_v1_5_mix665k_test.json',
-        image_path='/export/share/dataset/llava1.6'
-    )
-    add_dataset(hpt_v41)
-
-    # Pretrain
+    # S2
     coyo_25m = Dataset(
         dataset_name='coyo',
         dataset_type='coyo',
@@ -84,8 +74,36 @@ def register_datasets_mixtures():
         image_path="/export/share/dataset/ShareGPT4V/data",
     )
     add_dataset(sharegpt4v_pretrain)
-
-    # SFT
+    
+    struct_aware_parse_3m = Dataset(
+        dataset_name="struct_aware_parse_3m",
+        dataset_type="torch",
+        data_path='/export/share/yucheng/playground/hpt2.0/ocr_related/struct_aware_parse_3m_checked.json',
+        image_path='/export/share/dataset/llava1.6',
+    )
+    add_dataset(struct_aware_parse_3m)
+    
+    
+    multi_grained_text_localization_1m = Dataset(
+        dataset_name="multi_grained_text_localization_1m",
+        dataset_type="torch",
+        data_path='/export/share/yucheng/playground/hpt2.0/ocr_related/multi_grained_text_localization_1m_checked.json',
+        image_path='/export/share/dataset/llava1.6',
+    )
+    add_dataset(multi_grained_text_localization_1m)
+    
+    
+    # S3
+    hpt_v41 = Dataset(
+        dataset_name='hpt_v41',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/vila/hpt_v4_1_checked.json',
+        # data_path='/export/share/yucheng/playground/hpt2.0/llava_v1_5_mix665k_test.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(hpt_v41)
+    
+    # Others
     sharegpt4v_gpt4_100k = Dataset(
         dataset_name="sharegpt4v_gpt4_100k",
         dataset_type="torch",
@@ -243,8 +261,3 @@ def register_datasets_mixtures():
         image_path="./playground/data/sharegpt_video/videos",
     )
     add_dataset(sharegpt_video)
-
-
-
-
-    

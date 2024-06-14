@@ -10,7 +10,7 @@ n_node=4
 MASTER_ADDR=172.29.63.14
 CURRENT_RANK=$1
 BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b/stage1'
-OUTPUT='stage2'
+OUTPUT='hpt_llama3_8b'
 bs=8
 
 torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
@@ -39,7 +39,7 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 2000 \
-    --save_total_limit 1 \
+    --save_total_limit 10 \
     --learning_rate 5e-5 \
     --weight_decay 0. \
     --warmup_ratio 0.03 \

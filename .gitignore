@@ -1,5 +1,6 @@
 __pycache__/
 eval_output/
+hpt20_projects/
 *_dev.sh
 config.json
 eval-result/
