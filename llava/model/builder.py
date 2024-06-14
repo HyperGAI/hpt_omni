@@ -64,7 +64,11 @@ def load_pretrained_model(
     else:
         kwargs["torch_dtype"] = torch.float16
 
-    if is_mm_model(model_path):
+    is_mm_model_cur = True
+    print ('Warning: Current only load MM Model')
+    
+    # if is_mm_model(model_path):
+    if is_mm_model_cur:
         # Load LLaVA model
         ## TODO @yunhao: mind fixing lora
         if "lora" in model_name.lower() and model_base is None:
@@ -174,6 +178,8 @@ def load_pretrained_model(
             else:
                 # kentang-mit@: llama-2 model
                 # config._attn_implementation = "flash_attention_2"
+                
+                config.image_size = config.vision_tower_cfg['image_size']
                 model = LlavaLlamaModel(
                     config=config,
                     low_cpu_mem_usage=True,
