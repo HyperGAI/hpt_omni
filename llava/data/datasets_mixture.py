@@ -103,6 +103,38 @@ def register_datasets_mixtures():
     )
     add_dataset(hpt_v41)
     
+    hpto_v0 = Dataset(
+        dataset_name='hpto_v0',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/hpto_fuse/hpto_v0_checked.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(hpto_v0)
+    
+    doc_downstream = Dataset(
+        dataset_name='doc_downstream',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/ocr_related/doc_downstream_conversations_checked.json', # normal
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(doc_downstream)
+    
+    doc_reason25k = Dataset(
+        dataset_name='doc_reason25k',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/ocr_related/doc_reason25k_checked.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(doc_reason25k)
+    
+    doc_local4k = Dataset(
+        dataset_name='doc_local4k',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/ocr_related/doc_local4k_checked.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(doc_local4k)
+    
     # Others
     sharegpt4v_gpt4_100k = Dataset(
         dataset_name="sharegpt4v_gpt4_100k",
