@@ -895,7 +895,7 @@ class LazySupervisedDataset(Dataset):
         if isinstance(i, int):
             sources = [sources]
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
-        if "image" in sources[0]:
+        if "image" in sources[0] and sources[0]['image'] is not None:
             image_file = self.list_data_dict[i]["image"]
             if isinstance(image_file, list):
                 image = torch.stack(
@@ -954,7 +954,7 @@ class LazySupervisedDataset(Dataset):
             sources,
             self.tokenizer,
             has_image=(
-                "image" in self.list_data_dict[i]
+                ("image" in self.list_data_dict[i] and self.list_data_dict[i]['image'] is not None)
                 or "video" in self.list_data_dict[i]
                 or "video_id" in self.list_data_dict[i]
             ),
@@ -963,7 +963,7 @@ class LazySupervisedDataset(Dataset):
             data_dict = dict(input_ids=data_dict["input_ids"][0], labels=data_dict["labels"][0])
 
         # image exist in the data
-        if "image" in self.list_data_dict[i]:
+        if "image" in self.list_data_dict[i] and self.list_data_dict[i]['image'] is not None:
             if len(image.shape) == 4:
                 data_dict["image"] = image
             else:
