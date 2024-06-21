@@ -93,6 +93,7 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_weight_path: str = ""
     lora_bias: str = "none"
     mm_projector_lr: Optional[float] = None
+    mm_vit_lr: Optional[float] = None
     group_by_modality_length: bool = field(default=False)
     total_time_limit: int = field(
         default=-1, metadata={"help": "Timeout limit for this job (in minutes)."}

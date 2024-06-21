@@ -20,6 +20,7 @@ class LlavaConfig(PretrainedConfig):
         mm_use_im_start_end=False,
         mm_use_im_patch_token=True,
         mm_projector_lr=None,
+        mm_vit_lr=None,
         vision_resolution=None,
         interpolate_mode=None,
         s2=None,
@@ -44,6 +45,7 @@ class LlavaConfig(PretrainedConfig):
         self.mm_use_im_start_end = mm_use_im_start_end
         self.mm_use_im_patch_token = mm_use_im_patch_token
         self.mm_projector_lr = mm_projector_lr
+        self.mm_vit_lr = mm_vit_lr
         self.vision_resolution = vision_resolution
         self.interpolate_mode = interpolate_mode
         self.s2 = s2
