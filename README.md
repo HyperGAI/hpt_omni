@@ -12,13 +12,14 @@ pip install transformers==4.41.1
 ```
 
 ## Exps
-HPT
+HPT1.5 Edge(Phi3-Mini)
+
 ```
 stage-1-alignment
-bash scripts/v1_5/release/hpt/1_mm_align.sh
+bash scripts/train/hpt_phi3/1_align.sh
 
 stage-2-sft
-bash scripts/v1_5/release/hpt/3_sft.sh
+bash scripts/train/hpt_phi3/2_sft_0.sh
 ```
 
 VILA

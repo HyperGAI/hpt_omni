@@ -1,20 +1,11 @@
 #!/bin/bash
 
-master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
-export MASTER_ADDR=${master_addr:-"127.0.0.1"}
-export CURRENT_RANK=${SLURM_PROCID:-"0"}
-worker_list=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | tr '\n' ' ')
-n_node=${SLURM_JOB_NUM_NODES:-1}
-
-echo "MASTER_ADDR="$MASTER_ADDR
-echo "JobID: $SLURM_JOB_ID | Full list: $worker_list"
-
-n_nodes=1
-bs=16
-# OUTPUT of stage 2 script
-STAGE2_PATH=$1
-# Final output checkpoint path
-OUTPUT=$2
+n_node=2
+MASTER_ADDR=172.29.63.14
+CURRENT_RANK=$1
+BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b/stage2'
+OUTPUT='hpt_llama3_8b/stage3_hpto_v0'
+bs=8
 
 
 torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
@@ -22,9 +13,9 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     llava/train/train_mem.py \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path $BASE_MODEL_PATH \
-    --version v1 \
-    --data_mixture sharegpt4v_gpt4_100k+llava_instruct+sharegpt4v_sft+dvqa_train_200k+chartqa_train_18k+ai2d_train_12k+docvqa_train_10k+geoqa+synthdog_en+vflan+shot2story_shotonly+video_chatgpt+youcook2+vatex+sharegpt_video+scienceqa+wit_subset+math+sherlock \
-    --vision_tower google/siglip-so400m-patch14-384 \
+    --version llama_3 \
+    --data_mixture hpto_v0+vatex \
+    --vision_tower /export/share/models/siglip-so400m-patch14-384 \
     --mm_vision_select_feature cls_patch \
     --mm_projector mlp_downsample \
     --tune_vision_tower True \
@@ -42,8 +33,8 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --gradient_accumulation_steps 2 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
-    --save_steps 100 \
-    --save_total_limit 1 \
+    --save_steps 1000 \
+    --save_total_limit 5 \
     --learning_rate 1e-4 \
     --weight_decay 0. \
     --warmup_ratio 0.03 \
@@ -55,4 +46,5 @@ torchrun --nnodes=$n_node --nproc_per_node=8 --master_port=25001 \
     --dataloader_num_workers 16 \
     --lazy_preprocess True \
     --vflan_no_system_prompt True \
-    --report_to wandb
+    --image_size 490 \
+    --report_to none
