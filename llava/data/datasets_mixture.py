@@ -103,6 +103,22 @@ def register_datasets_mixtures():
     )
     add_dataset(hpt_v41)
     
+    hpt_text_03m = Dataset(
+        dataset_name='hpt_text_03m',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/hpto_fuse/text_data_03m.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(hpt_text_03m)
+    
+    hpt_text_06m = Dataset(
+        dataset_name='hpt_text_06m',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/hpto_fuse/text_data_06m.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(hpt_text_06m)
+    
     hpto_v0 = Dataset(
         dataset_name='hpto_v0',
         dataset_type='torch',
