@@ -8,15 +8,8 @@ pip install packaging
 pip install torch==2.1.2
 pip install -e .
 pip install -e ".[train]"
-
-if model_name == phi_3:
-    pip install transformers==4.41.1
-else:
-    pip install git+https://github.com/huggingface/transformers@v4.36.2
-    site_pkg_path=$(python -c 'import site; print(site.getsitepackages()[0])')
-    cp -rv ./llava/train/transformers_replace/* $site_pkg_path/transformers/
+pip install transformers==4.41.1
 ```
-
 
 ## Exps
 HPT
@@ -35,12 +28,10 @@ bash scripts/train/vila_3b/1_mm_align.sh
 
 stage-2-pretrain(2 node)
 bash scripts/train/vila_3b/2_pretrain_0.sh
-bash scripts/train/vila_3b/2_pretrain_1.sh
 
 stage-3-sft
 bash scripts/train/vila_3b/3_sft.sh
 ```
 
 ## Eval
-- MMbench server: https://mmbench.opencompass.org.cn/mmbench-submission
-- VizWiz server: https://eval.ai/web/challenges/challenge-page/2185/my-submission
+https://github.com/HyperGAI/HPTEvalKit
