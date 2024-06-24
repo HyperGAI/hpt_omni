@@ -28,7 +28,7 @@ stage-1-alignment
 bash scripts/train/vila_3b/1_mm_align.sh
 
 stage-2-pretrain(2 node)
-bash scripts/train/vila_3b/2_pretrain_0.sh
+bash scripts/train/vila_3b/2_pretrain.sh
 
 stage-3-sft
 bash scripts/train/vila_3b/3_sft.sh

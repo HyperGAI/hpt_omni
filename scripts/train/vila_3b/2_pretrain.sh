@@ -8,7 +8,7 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 
 n_node=3
 MASTER_ADDR=172.29.201.40
-CURRENT_RANK=1
+CURRENT_RANK=$1
 BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/vila_3b/stage1'
 OUTPUT='stage2'
 bs=16
