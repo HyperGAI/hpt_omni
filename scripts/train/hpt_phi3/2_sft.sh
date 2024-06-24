@@ -2,7 +2,7 @@
 
 n_node=2
 MASTER_ADDR=172.29.237.9
-CURRENT_RANK=0
+CURRENT_RANK=$1
 BASE_MODEL_PATH='/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt15_phi3/stage1'
 OUTPUT='hpt15_phi3/stage2'
 bs=16

@@ -12,22 +12,22 @@ pip install transformers==4.41.1
 ```
 
 ## Exps
-HPT1.5 Edge(Phi3-Mini)
+HPT1.5 Edge(Phi-3-mini-4k-instruct)
 
 ```
 stage-1-alignment
 bash scripts/train/hpt_phi3/1_align.sh
 
-stage-2-sft
-bash scripts/train/hpt_phi3/2_sft_0.sh
+stage-2-sft(2 node)
+bash scripts/train/hpt_phi3/2_sft.sh
 ```
 
-VILA
+VILA-3B(Sheared-LLaMA-2.7B)
 ```
 stage-1-alignment
 bash scripts/train/vila_3b/1_mm_align.sh
 
-stage-2-pretrain(2 node)
+stage-2-pretrain(3 node)
 bash scripts/train/vila_3b/2_pretrain.sh
 
 stage-3-sft
