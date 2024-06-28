@@ -465,7 +465,7 @@ llama_3_chat_fix = Conversation(
            "and assist the user with a variety of tasks using natural language.",
     roles=("<|start_header_id|>user<|end_header_id|>\n\n",
            "<|start_header_id|>assistant<|end_header_id|>\n\n"),
-    version="llama_v3",
+    version="llama_v3_fix",
     messages=(),
     offset=0,
     sep_style=SeparatorStyle.LLAMA_3,
