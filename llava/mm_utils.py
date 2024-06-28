@@ -203,7 +203,7 @@ def process_images(images, image_processor, model_cfg):
 
 
 def tokenizer_image_token(
-    prompt, tokenizer, image_token_index=IMAGE_TOKEN_INDEX, return_tensors=None
+    prompt, tokenizer, image_token_index=IMAGE_TOKEN_INDEX, return_tensors=None, model_type='llama3'
 ):
     prompt_chunks = [tokenizer(chunk).input_ids for chunk in prompt.split("<image>")]
 
@@ -216,6 +216,7 @@ def tokenizer_image_token(
         len(prompt_chunks) > 0
         and len(prompt_chunks[0]) > 0
         and prompt_chunks[0][0] == tokenizer.bos_token_id
+        and model_type != 'llama3'
     ):
         offset = 1
         input_ids.append(prompt_chunks[0][0])

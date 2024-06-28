@@ -458,6 +458,20 @@ llama_3_chat = Conversation(
     sep="<|end_of_text|>",
 )
 
+# Follow the template from: https://github.com/meta-llama/llama-recipes
+llama_3_chat_fix = Conversation(
+    system="<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful language and vision assistant. "
+           "You are able to understand the visual content that the user provides, "
+           "and assist the user with a variety of tasks using natural language.",
+    roles=("<|start_header_id|>user<|end_header_id|>\n\n",
+           "<|start_header_id|>assistant<|end_header_id|>\n\n"),
+    version="llama_v3",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.LLAMA_3,
+    sep="<|eot_id|>",
+)
+
 
 # https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
 phi_3_chat = Conversation(
@@ -488,6 +502,7 @@ conv_templates = {
     "default": conv_vicuna_v0,
     "hermes-2": hermes_2,
     "llama_3": llama_3_chat,
+    "llama_3_fix": llama_3_chat_fix,
     "v0": conv_vicuna_v0,
     "v1": conv_vicuna_v1,
     "vicuna_v1": conv_vicuna_v1,

@@ -264,10 +264,10 @@ def preprocess_llama_3(
             conv.append_message(role, sentence["value"])
         conversations.append(conv.get_prompt())
     # Tokenize conversations
-
+    
     if has_image:
         input_ids = torch.stack(
-            [tokenizer_image_token(prompt, tokenizer, return_tensors='pt') for prompt in conversations], dim=0)
+            [tokenizer_image_token(prompt, tokenizer, return_tensors='pt', model_type='llama3') for prompt in conversations], dim=0)
     else:
         input_ids = tokenizer(
             conversations,
