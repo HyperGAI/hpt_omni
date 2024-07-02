@@ -21,7 +21,13 @@ from llava.utils import disable_torch_init
 
 
 MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b/stage3'
+MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/llama3_8b/0614_fuse_interleaved_ocr_data/stage3'
+MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/llama3_8b/0614_fuse_interleaved_ocr_data/stage3_with_text'
+# MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b/stage3_hpto_v0'
+MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b/stage3_with_text_06m'
+MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b_fix_lr/stage3_with_text_06m'
 conv_mode = 'llama_3'
+conv_mode = 'llama_3_fix'
 
 # MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/vila_3b/stage3'
 # conv_mode = 'v1'
