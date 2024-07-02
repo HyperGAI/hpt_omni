@@ -119,6 +119,22 @@ def register_datasets_mixtures():
     )
     add_dataset(hpt_text_06m)
     
+    hpt_text_09m = Dataset(
+        dataset_name='hpt_text_09m',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/hpto_fuse/text_data_09m.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(hpt_text_09m)
+    
+    cambrian7m = Dataset(
+        dataset_name='cambrian7m',
+        dataset_type='torch',
+        data_path='/export/share/dataset/Cambrian-10M/Cambrian7M_withsystemprompt_checked.json',
+        image_path='/export/share/dataset/Cambrian-10M'
+    )
+    add_dataset(cambrian7m)
+    
     hpto_v0 = Dataset(
         dataset_name='hpto_v0',
         dataset_type='torch',
