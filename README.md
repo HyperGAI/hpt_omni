@@ -1,5 +1,11 @@
 # HPTO Training Framework
 
+## Release Note
+[0702] hpto 1.0.0
+- model_path: /export/share/yucheng/models/hpto_1.0
+- hpto wheel: /export/share/yucheng/hpt/hpt_omni/dist/hpt_omni-1.0.0-py3-none-any.whl
+
+
 ## Env
 ```
 conda create -n hpto python=3.10 -y
