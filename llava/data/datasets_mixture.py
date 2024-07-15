@@ -51,6 +51,13 @@ def register_datasets_mixtures():
     add_dataset(blip_laion_cc_sbu_558k)
     
     # S2
+    obelics = Dataset(
+        dataset_name='obelics',
+        dataset_type='obelics',
+        data_path = '/export/share/dataset/OBELICS/final'
+    )
+    add_dataset(obelics)
+
     coyo_25m = Dataset(
         dataset_name='coyo',
         dataset_type='coyo',

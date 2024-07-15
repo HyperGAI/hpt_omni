@@ -28,7 +28,7 @@ import time
 import warnings
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
-
+from tqdm import tqdm
 import numpy as np
 import PIL
 import torch
@@ -52,7 +52,7 @@ from llava.mm_utils import is_gemma_tokenizer, tokenizer_image_token, opencv_ext
 from llava.model import *
 from llava.train.args import DataArguments, TrainingArguments
 from llava.train.llava_trainer import LLaVATrainer
-
+import pickle as pkl
 # torch.backends.cudnn.enabled = False
 
 
@@ -980,6 +980,162 @@ class LazySupervisedDataset(Dataset):
             # vila way
             data_dict["image"] = None
         return data_dict
+
+class LazyOBELICSDataset(Dataset):
+    """Dataset for supervised fine-tuning.
+    This class is implemented by Ji Lin and Haotian Tang."""
+
+    num_image_tokens = 576
+
+    def __init__(
+        self,
+        data_path: str,
+        image_folder: str,
+        tokenizer: transformers.PreTrainedTokenizer,
+        data_args: DataArguments,
+        training_args: TrainingArguments,
+        image_following_text_only=False,
+        text_only=False,
+    ):
+        super().__init__()
+
+        import polars as pl
+
+        n_samples = []
+        # actually shards and stats info
+        n_shards = len(os.listdir(data_path)) // 2
+        n_shards = 10000
+        count_info_list = sorted([f for f in os.listdir(data_path) if f.endswith(".count")])[:n_shards]
+        n_samples = [int(open(os.path.join(data_path, f), "rb").read().strip()) for f in count_info_list]
+
+        print ('OBELICS data path:', data_path)
+        print("total OBELICS samples", sum(n_samples))  # 10,881,869
+
+        rank = training_args.process_index  # int(os.environ["RANK"])
+        world_size = training_args.world_size  # int(os.environ["WORLD_SIZE"])
+        shared_size = n_shards // world_size
+
+        gpu_samples = [sum(n_samples[i * shared_size : (i + 1) * shared_size]) for i in range(world_size)]
+        self.n_samples = min(gpu_samples) * world_size  # total size
+        self.idx_offset = rank * min(gpu_samples)
+        shard_start, shard_end = rank * shared_size, (rank + 1) * shared_size
+        print(f" * loading data from shard {shard_start}-{shard_end}")
+
+        shard_names = [d.replace(".count", ".parquet") for d in count_info_list]
+        shard_names = shard_names[shard_start:shard_end]
+
+        full_data_list = []
+        # now load data
+        for shard_name in tqdm(shard_names):
+            data_list = pl.read_parquet(os.path.join(data_path, shard_name))
+            rows = data_list.rows() # row[0]= text, row[1] = image
+            full_data_list.extend(rows)
+
+        print("* loaded totally {} samples".format(len(full_data_list)))
+
+        self.data_list = full_data_list
+
+        self.tokenizer = tokenizer
+        self.data_args = data_args
+        self.image_folder = image_folder
+
+        self.image_following_text_only = image_following_text_only
+        self.text_only = text_only
+    def __len__(self):
+        # return len(self.data_list)
+        return self.n_samples
+
+    @property
+    def modality_lengths(self):
+        # Estimate the number of tokens after tokenization, used for length-grouped sampling
+        length_list = []
+        for info in self.data_list:
+            num_images = info['text'].count('<image>')
+            txt_len = len(info['text']) // 2
+            length_list.append(cur_len)
+            cur_len = num_images * self.num_image_tokens // 2 + sum([len(x) for x in sentences])
+        return length_list
+
+    def __getitem__(self, i) -> Dict[str, torch.Tensor]:
+        info = self.data_list[i - self.idx_offset]
+        # info[0] = text, info[1] = image_path
+        text = info[0]
+        img_path = info[1]
+        image_bytes = pkl.load(open(img_path, 'rb'))
+        images, sentence_ixs = [], []
+        for idx, rawbytes in image_bytes.items():
+            image = Image.open(io.BytesIO(rawbytes)).convert('RGB')
+            images.append(image)
+            sentence_ixs.append(int(idx))
+        
+
+        # reorder images according to text insertion
+        images = [images[iii] for iii in np.argsort(sentence_ixs)]
+
+        # preprocess and tokenize text
+        text = text.replace("<image> ", "<image>").replace(" <image>", "<image>")
+        text = f"{text}{self.tokenizer.eos_token}"  # add eos token
+
+        if len(images) > 0:
+            images = torch.stack(
+                [process_image(image, self.data_args, self.image_folder) for image in images]
+            )
+
+            # the same size for all images, so we concat
+            # cur_token_len = (
+            #     images[0].shape[-2] // self.multimodal_cfg["patch_size"]
+            # ) * (images[0].shape[-1] // self.multimodal_cfg["patch_size"])
+            # cur_token_len += self.multimodal_cfg["n_extra_patch"]
+        else:
+            images = None
+            # cur_token_len = 0
+
+        # im_patch_token = self.tokenizer.convert_tokens_to_ids(
+        #     [DEFAULT_IMAGE_PATCH_TOKEN]
+        # )[0]
+        # print(text, len(images))
+        input_ids = tokenizer_image_token(
+            text,
+            self.tokenizer,
+            return_tensors="pt",
+        )
+        assert len(input_ids.shape) == 1
+
+        # now check the case where the last token is image patch token
+        if input_ids[-1] == IMAGE_TOKEN_INDEX:  # need to remove one last image
+            last_non_im_patch_indices = torch.where(input_ids != IMAGE_TOKEN_INDEX)[0][-1] + 1
+            input_ids = input_ids[:last_non_im_patch_indices]
+
+        n_im_patch = (input_ids == IMAGE_TOKEN_INDEX).sum().item()
+
+        images = images[:n_im_patch]
+        assert len(images) == n_im_patch, print(text, input_ids)
+
+        targets = input_ids.clone()
+
+        if self.image_following_text_only:  # keep only text after leading image token
+            # remove loss for any token before the first <image> token
+            label_idx = 0
+            while label_idx < targets.shape[-1] and targets[label_idx] != IMAGE_TOKEN_INDEX:
+                targets[label_idx] = IGNORE_INDEX
+                label_idx += 1
+
+            pad_token = self.tokenizer.convert_tokens_to_ids([self.tokenizer.pad_token])[0]
+
+            pad_token_idxs = torch.where(targets == pad_token)[0]
+            for pad_token_idx in pad_token_idxs:
+                token_idx = pad_token_idx + 1
+                while token_idx < targets.shape[-1] and targets[token_idx] != IMAGE_TOKEN_INDEX:
+                    targets[token_idx] = IGNORE_INDEX
+                    token_idx += 1
+            # do not train on padding tokens
+            targets[targets == pad_token] = IGNORE_INDEX
+
+        # mask image tokens is unnecessary for llava-1.5
+        # targets[targets == IMAGE_TOKEN_INDEX] = IGNORE_INDEX
+        # print(input_ids.shape)
+        return dict(input_ids=input_ids, labels=targets, image=images)
+
 
 
 class LazyMMC4Dataset(Dataset):
@@ -2139,6 +2295,8 @@ def build_datasets(
             dataset_cls = LazyWDSDataset
         elif dataset_type == "mmc4":
             dataset_cls = LazyMMC4Dataset
+        elif dataset_type == 'obelics':
+            dataset_cls = LazyOBELICSDataset
         elif dataset_type == "coyo":
             dataset_cls = LazyCoyoDataset
         elif dataset_type == "sam-wds":
@@ -2167,7 +2325,6 @@ def build_datasets(
         elif dataset_type == "panda70m":
             print("dataset.py: Loading VILAPanda70m class")
             from llava.data.dataset_impl.panda70m import VILAPanda70m
-
             dataset_cls = VILAPanda70m
         elif dataset_type == "ccs-wds":
             dataset_cls = LazyCCSWebDataset
