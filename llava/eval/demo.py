@@ -26,6 +26,9 @@ MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/llama3_8b/0614_fuse
 # MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b/stage3_hpto_v0'
 MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b/stage3_with_text_06m'
 MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b_fix_lr/stage3_with_text_06m'
+# MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b_fix_lr/stage3_with_fuse_cambrian7m'
+MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b_15/stage3_with_text_06m'
+MODEL_PATH = '/export/share/yucheng/hpt/hpt_omni/checkpoints/hpt_llama3_8b_internvit6b_15/stage3_with_text_09m'
 conv_mode = 'llama_3'
 conv_mode = 'llama_3_fix'
 
@@ -42,7 +45,7 @@ args = argparse.Namespace(
     temperature = 0.2,
     top_p = None,
     num_beams = 1,
-    max_new_tokens = 512,
+    max_new_tokens = 1024,
     model_base = None
 )
 

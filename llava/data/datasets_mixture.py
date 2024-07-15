@@ -75,6 +75,14 @@ def register_datasets_mixtures():
     )
     add_dataset(sharegpt4v_pretrain)
     
+    sharegpt4v_pretrain_v1 = Dataset(
+        dataset_name="sharegpt4v_pretrain_v1",
+        dataset_type="torch",
+        data_path="/export/share/dataset/ShareGPT4V/share-captioner_coco_lcs_sam_1246k_1107_checked_generate.json",
+        image_path="/export/share/dataset/ShareGPT4V/data",
+    )
+    add_dataset(sharegpt4v_pretrain_v1)
+    
     struct_aware_parse_3m = Dataset(
         dataset_name="struct_aware_parse_3m",
         dataset_type="torch",
@@ -82,6 +90,14 @@ def register_datasets_mixtures():
         image_path='/export/share/dataset/llava1.6',
     )
     add_dataset(struct_aware_parse_3m)
+    
+    struct_aware_parse_3m_v1 = Dataset(
+        dataset_name="struct_aware_parse_3m_v1",
+        dataset_type="torch",
+        data_path='/export/share/yucheng/playground/hpt2.0/ocr_related/struct_aware_parse_3m_checked_v1.json',
+        image_path='/export/share/dataset/llava1.6',
+    )
+    add_dataset(struct_aware_parse_3m_v1)
     
     
     multi_grained_text_localization_1m = Dataset(
@@ -126,6 +142,14 @@ def register_datasets_mixtures():
         image_path='/export/share/dataset/llava1.6'
     )
     add_dataset(hpt_text_09m)
+    
+    openhermes2_5 = Dataset(
+        dataset_name='openhermes2_5',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/hpto_fuse/openhermes2_5.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(openhermes2_5)
     
     cambrian7m = Dataset(
         dataset_name='cambrian7m',
