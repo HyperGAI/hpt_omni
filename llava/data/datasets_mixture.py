@@ -198,6 +198,22 @@ def register_datasets_mixtures():
     )
     add_dataset(doc_local4k)
     
+    video_chatgpt = Dataset(
+        dataset_name='video_chatgpt',
+        dataset_type='torch',
+        data_path='/export/share/dataset/Video-ChatGPT/video_chatgpt_train_clean.json',
+        image_path='/export/share/dataset/Video-ChatGPT/activitynet_videos'
+    )
+    add_dataset(video_chatgpt)
+    
+    shot2story_shotonly = Dataset(
+        dataset_name='shot2story_shotonly',
+        dataset_type='torch',
+        data_path='/export/share/dataset/Shot2story/shot2story_shot.json',
+        image_path='/export/share/dataset/Shot2story/videos/'
+    )
+    add_dataset(shot2story_shotonly)
+    
     # Others
     sharegpt4v_gpt4_100k = Dataset(
         dataset_name="sharegpt4v_gpt4_100k",
