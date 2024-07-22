@@ -115,6 +115,14 @@ def register_datasets_mixtures():
     )
     add_dataset(multi_grained_text_localization_1m)
     
+    text_fuse_s2 = Dataset(
+        dataset_name='text_fuse_s2',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/text_fuse/text_fuse_s2_0719.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(text_fuse_s2)
+    
     
     # S3
     hpt_v41 = Dataset(
@@ -157,6 +165,14 @@ def register_datasets_mixtures():
         image_path='/export/share/dataset/llava1.6'
     )
     add_dataset(openhermes2_5)
+    
+    cambrain_text_06m = Dataset(
+        dataset_name='cambrain_text_06m',
+        dataset_type='torch',
+        data_path='/export/share/dataset/Cambrian-10M/cambrian_text_06m.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(cambrain_text_06m)
     
     cambrian7m = Dataset(
         dataset_name='cambrian7m',
@@ -213,6 +229,22 @@ def register_datasets_mixtures():
         image_path='/export/share/dataset/Shot2story/videos/'
     )
     add_dataset(shot2story_shotonly)
+    
+    text_fuse_s3 = Dataset(
+        dataset_name='text_fuse_s3',
+        dataset_type='torch',
+        data_path='/export/share/yucheng/playground/hpt2.0/text_fuse/text_fuse_s3_0719.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(text_fuse_s3)
+    
+    text_cot_1m = Dataset(
+        dataset_name='text_cot_1m',
+        dataset_type='torch',
+        data_path='/export/share/dataset/textonly/cot_1m.json',
+        image_path='/export/share/dataset/llava1.6'
+    )
+    add_dataset(text_cot_1m)
     
     # Others
     sharegpt4v_gpt4_100k = Dataset(
@@ -349,21 +381,21 @@ def register_datasets_mixtures():
     )
     add_dataset(vatex)
 
-    video_chatgpt = Dataset(
-        dataset_name="video_chatgpt",
-        dataset_type="torch",
-        data_path="./playground/data/Video_ChatGPT/VideoInstruct-100K/VideoInstruct100K.json",
-        image_path="./playground/data/Video_ChatGPT/activitynet_videos/",
-    )
-    add_dataset(video_chatgpt)
+    # video_chatgpt = Dataset(
+    #     dataset_name="video_chatgpt",
+    #     dataset_type="torch",
+    #     data_path="./playground/data/Video_ChatGPT/VideoInstruct-100K/VideoInstruct100K.json",
+    #     image_path="./playground/data/Video_ChatGPT/activitynet_videos/",
+    # )
+    # add_dataset(video_chatgpt)
 
-    shot2story_shotonly = Dataset(
-        dataset_name="shot2story_shotonly",
-        dataset_type="torch",
-        data_path="./playground/data/shot2story/shot2story_shotonly.json",
-        image_path="./playground/data/shot2story/Shot2Story/data/videos_extracted",
-    )
-    add_dataset(shot2story_shotonly)
+    # shot2story_shotonly = Dataset(
+    #     dataset_name="shot2story_shotonly",
+    #     dataset_type="torch",
+    #     data_path="./playground/data/shot2story/shot2story_shotonly.json",
+    #     image_path="./playground/data/shot2story/Shot2Story/data/videos_extracted",
+    # )
+    # add_dataset(shot2story_shotonly)
 
     sharegpt_video = Dataset(
         dataset_name="sharegpt_video",
