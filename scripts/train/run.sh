@@ -57,7 +57,7 @@ torchrun --nnodes=$n_node --nproc_per_node=$nproc_per_node --master_port=25001 \
     --tf32 True \
     --model_max_length 4096 \
     --gradient_checkpointing True \
-    --dataloader_num_workers 0 \
+    --dataloader_num_workers 8 \
     --lazy_preprocess True \
     --image_size 448 \
     --mm_vit_lr 5e-6 \
