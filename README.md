@@ -15,6 +15,8 @@ pip install torch==2.1.2
 pip install -e .
 pip install -e ".[train]"
 pip install transformers==4.41.1
+pip uninstall transformer-engine
+pip uninstall apex
 ```
 
 ## Exps
