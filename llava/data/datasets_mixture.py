@@ -54,7 +54,7 @@ def register_datasets_mixtures():
     obelics = Dataset(
         dataset_name='obelics',
         dataset_type='obelics',
-        data_path = '/export/share/dataset/OBELICS/final'
+        data_path = '/export/share/dataset/OBELICS/final_400'
     )
     add_dataset(obelics)
 
@@ -118,7 +118,7 @@ def register_datasets_mixtures():
     text_fuse_s2 = Dataset(
         dataset_name='text_fuse_s2',
         dataset_type='torch',
-        data_path='/export/share/yucheng/playground/hpt2.0/text_fuse/text_fuse_s2_0719.json',
+        data_path='/export/share/yucheng/playground/hpt2.0/text_fuse/text_fuse_s2_0730.json',
         image_path='/export/share/dataset/llava1.6'
     )
     add_dataset(text_fuse_s2)
@@ -214,6 +214,14 @@ def register_datasets_mixtures():
     )
     add_dataset(doc_local4k)
     
+    mm_40k = Dataset(
+        dataset_name='mm_40k',
+        dataset_type='torch',
+        data_path='/export/share/dataset/ChartY/ChartY_Benchmark/OneChart_checked.json',
+        image_path='/export/share/dataset/ChartY/ChartY_Benchmark/imgs/'
+    )
+    add_dataset(mm_40k)
+    
     video_chatgpt = Dataset(
         dataset_name='video_chatgpt',
         dataset_type='torch',
@@ -233,7 +241,7 @@ def register_datasets_mixtures():
     text_fuse_s3 = Dataset(
         dataset_name='text_fuse_s3',
         dataset_type='torch',
-        data_path='/export/share/yucheng/playground/hpt2.0/text_fuse/text_fuse_s3_0719.json',
+        data_path='/export/share/yucheng/playground/hpt2.0/text_fuse/text_fuse_s3_0730.json',
         image_path='/export/share/dataset/llava1.6'
     )
     add_dataset(text_fuse_s3)

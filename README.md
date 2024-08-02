@@ -17,6 +17,9 @@ pip install -e ".[train]"
 pip install transformers==4.41.1
 pip uninstall transformer-engine
 pip uninstall apex
+
+# for llama3.1, should update transformers version:
+pip install transformers==4.43.1
 ```
 
 ## Exps

@@ -327,6 +327,102 @@ def preprocess_llama_3(
         labels=targets,
     )
     
+    
+def preprocess_llama_31(
+    sources,
+    tokenizer: transformers.PreTrainedTokenizer,
+    has_image: bool = False,
+    no_system_prompt: bool = False,
+) -> Dict:
+    # Note: implemented by yukang2017@, verified by kentang-mit@
+    conv = conversation_lib.default_conversation.copy()
+    roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
+    if no_system_prompt:
+        conv.system = ""
+
+    # Apply prompt templates
+    conversations = []
+    for i, source in enumerate(sources):
+        if roles[source[0]["from"]] != conv.roles[0]:
+            # Skip the first one if it is not from human
+            source = source[1:]
+
+        conv.messages = []
+        for j, sentence in enumerate(source):
+            role = roles[sentence["from"]]
+            assert role == conv.roles[j % 2], f"{i}"
+            conv.append_message(role, sentence["value"])
+        conversations.append(conv.get_prompt())
+    # Tokenize conversations
+    
+    if has_image:
+        input_ids = torch.stack(
+            [tokenizer_image_token(prompt, tokenizer, return_tensors='pt', model_type='llama31') for prompt in conversations], dim=0)
+    else:
+        input_ids = tokenizer(
+            conversations,
+            return_tensors="pt",
+            padding="longest",
+            max_length=tokenizer.model_max_length,
+            truncation=True,
+        ).input_ids
+    
+    targets = input_ids.clone()
+    assert conv.sep_style == conversation_lib.SeparatorStyle.LLAMA_3
+
+    # Mask targets
+    sep = conv.sep + conv.roles[1]
+    for conversation, target in zip(conversations, targets):
+        total_len = int(target.ne(tokenizer.pad_token_id).sum())
+
+        rounds = conversation.split(conv.sep)
+        re_rounds = [conv.sep.join(rounds[:3])]  # system + user + gpt
+        for conv_idx in range(3, len(rounds), 2):
+            re_rounds.append(conv.sep.join(rounds[conv_idx:conv_idx + 2]))  # user + gpt
+        cur_len = 0
+        target[:cur_len] = IGNORE_INDEX
+        for i, rou in enumerate(re_rounds):
+            if rou == "":
+                break
+
+            parts = rou.split(sep)
+            if len(parts) != 2:
+                print(f"WARNING: parts!=: {parts}")
+                break
+            parts[0] += sep
+
+            if has_image:
+                round_len = len(tokenizer_image_token(rou, tokenizer, model_type='llama31'))
+                instruction_len = len(tokenizer_image_token(parts[0], tokenizer, model_type='llama31')) - 1
+            else:
+                round_len = len(tokenizer(rou).input_ids)
+                instruction_len = len(tokenizer(parts[0]).input_ids) - 1
+
+            # include <|eot_id|> for all rounds
+            round_len += 1
+            instruction_len += 1
+
+            target[cur_len: cur_len + instruction_len] = IGNORE_INDEX
+            cur_len += round_len
+
+        target[cur_len:] = IGNORE_INDEX
+
+        if cur_len < tokenizer.model_max_length:
+            if cur_len != total_len:
+                target[:] = IGNORE_INDEX
+                print(f"WARNING: tokenization mismatch: {cur_len} vs. {total_len}. {sources}" f" (ignored)")
+    # print (input_ids)
+    # print (targets)
+    # print (conversations)
+    # target_useful = input_ids[0,torch.where(targets>0)[1]]
+    # print(tokenizer.decode(target_useful))
+    # print ()
+    
+    return dict(
+        input_ids=input_ids,
+        labels=targets,
+    )
+    
 
 def preprocess_phi_3(
     sources,
@@ -680,7 +776,8 @@ def preprocess(
     if conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.MISTRAL:
         return preprocess_llama_2(sources, tokenizer, has_image=has_image, is_mistral=True)
     if conversation_lib.default_conversation.sep_style == conversation_lib.SeparatorStyle.LLAMA_3:
-        return preprocess_llama_3(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
+        # return preprocess_llama_3(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
+        return preprocess_llama_31(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
     if conversation_lib.default_conversation.version.startswith("v1"):
         return preprocess_v1(sources, tokenizer, has_image=has_image, no_system_prompt=no_system_prompt)
     if conversation_lib.default_conversation.version == 'phi_3':
@@ -1004,7 +1101,8 @@ class LazyOBELICSDataset(Dataset):
         n_samples = []
         # actually shards and stats info
         n_shards = len(os.listdir(data_path)) // 2
-        n_shards = 10000
+        # n_shards = 10000
+        n_shards = 400
         count_info_list = sorted([f for f in os.listdir(data_path) if f.endswith(".count")])[:n_shards]
         n_samples = [int(open(os.path.join(data_path, f), "rb").read().strip()) for f in count_info_list]
 
@@ -1107,7 +1205,11 @@ class LazyOBELICSDataset(Dataset):
             input_ids = input_ids[:last_non_im_patch_indices]
 
         n_im_patch = (input_ids == IMAGE_TOKEN_INDEX).sum().item()
-
+        if n_im_patch > images.shape[0]:
+            num_pad = n_im_patch - images.shape[0]
+            images_pad = images[-1].unsqueeze(0).repeat(num_pad, 1, 1, 1)
+            images = torch.concat([images, images_pad])
+            
         images = images[:n_im_patch]
         assert len(images) == n_im_patch, print(text, input_ids)
 

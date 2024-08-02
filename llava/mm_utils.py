@@ -219,7 +219,8 @@ def tokenizer_image_token(
         and model_type != 'llama3'
     ):
         offset = 1
-        input_ids.append(prompt_chunks[0][0])
+        if model_type != 'llama31':
+            input_ids.append(prompt_chunks[0][0])
 
     for x in insert_separator(prompt_chunks, [image_token_index] * (offset + 1)):
         input_ids.extend(x[offset:])
